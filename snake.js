@@ -1,10 +1,12 @@
 class Snake {
   constructor() {
+    this.x;
+    this.y;
     this.vel = {
       x: 1,
       y: 0
     }
-    this.length = 1;
+    this.maxLength = 10;
     this.tail = [];
     this.prevCoords;
 
@@ -21,24 +23,23 @@ class Snake {
     }
 
     this.update = function() {
-      for (let i = 0; i < this.tail.length; i++) {
-        if (i === 0) {
-          this.tail[i].x += this.vel.x * scale;
-          this.tail[i].y += this.vel.y * scale;
-          if (this.tail.length <= 1) {
-            this.prevCoords = this.tail[i];
-          }
-        } else {
-          this.tail[i] = this.prevCoords;
+      this.x += this.vel.x * scale;
+      this.y += this.vel.y * scale;
+
+      if (this.vel.x !== 0 || this.vel.y !== 0) {
+        this.tail.unshift({ x: this.x, y: this.y });
+      
+        if (this.tail.length > this.maxLength) {
+          this.tail.pop();
         }
       }
 
-      // if (this.x === 0 || this.x >= canvas.width - scale) {
-      //   this.vel.x = 0;
-      // }
-      // if (this.y === 0 || this.y >= canvas.height - scale) {
-      //   this.vel.y = 0;
-      // }
+      if (this.x === 0 || this.x >= canvas.width - scale) {
+        this.vel.x = 0;
+      }
+      if (this.y === 0 || this.y >= canvas.height - scale) {
+        this.vel.y = 0;
+      }
     }
   }
 }

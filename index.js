@@ -5,6 +5,7 @@ const scale = 10;
 const snake = new Snake();
 const food = new Food();
 let canChangeDirection = true;
+let gameEnd = false;
 
 function start() {
   resetCanvas();
@@ -22,10 +23,28 @@ function start() {
       eatFood();
       spawnFood();
     }
+    // Check if snake touches itself
+    snake.tail.forEach((partA, i) => {
+      snake.tail.forEach((partB, j) => {
+        if (checkCollisions(partA, partB) && i !== j) {
+          endGame();
+        }
+      });
+    });
 
     food.draw();
     snake.draw();
+    drawScore();
   }, 150);
+}
+
+function endGame() {
+  snake.vel.x = 0;
+  snake.vel.y = 0;
+  gameEnd = true;
+  setTimeout(() => {
+    location.reload();
+  }, 3000);
 }
 
 function checkCollisions(a, b) {
@@ -36,18 +55,13 @@ function checkCollisions(a, b) {
 }
 
 function eatFood() {
-  snake.tail.unshift({
-    x: snake.tail[snake.tail.length - 1].x - snake.vel.x * scale,
-    y: snake.tail[snake.tail.length - 1].y - snake.vel.y * scale
-  });
+  snake.maxLength++;
 }
 
 function spawnSnake() {
   const newCoords = getRandCoords();
-  snake.tail.unshift({
-    x: newCoords.x,
-    y: newCoords.y
-  });
+  snake.x = newCoords.x;
+  snake.y = newCoords.y;
 }
 
 function spawnFood() {
@@ -56,22 +70,46 @@ function spawnFood() {
 }
 
 addEventListener('keydown', e => {
-  if (canChangeDirection) {
-    if (e.key === 'ArrowUp' && snake.vel.y === 0 && snake.tail[0].y > 0) {
+  if (canChangeDirection && !gameEnd) {
+    if (e.key === 'ArrowUp' && snake.vel.y === 0 && snake.y > 0) {
       snake.setVelocity(0, 1);
       canChangeDirection = false;
-    } else if (e.key === 'ArrowDown' && snake.vel.y === 0 && snake.tail[0].y < canvas.height - scale) {
+    } else if (e.key === 'ArrowDown' && snake.vel.y === 0 && snake.y < canvas.height - scale) {
       snake.setVelocity(0, -1);
       canChangeDirection = false;
-    } else if (e.key === 'ArrowLeft' && snake.vel.x === 0 && snake.tail[0].x > 0) {
+    } else if (e.key === 'ArrowLeft' && snake.vel.x === 0 && snake.x > 0) {
       snake.setVelocity(-1, 0);
       canChangeDirection = false;
-    } else if (e.key === 'ArrowRight' && snake.vel.x === 0 && snake.tail[0].x < canvas.width - scale) {
+    } else if (e.key === 'ArrowRight' && snake.vel.x === 0 && snake.x < canvas.width - scale) {
       snake.setVelocity(1, 0);
       canChangeDirection = false;
     }
   }
 });
+
+function drawScore() {
+  if (gameEnd) {
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = 'black';
+    ctx.lineWidth = 3;
+    ctx.font = '50px sans-serif';
+    ctx.strokeText(`Score: ${snake.maxLength}`, canvas.width / 2, canvas.height / 2);
+    ctx.fillStyle = 'lightgreen';
+    ctx.font = '60 sans-serif';
+    ctx.fillText(`Score: ${snake.maxLength}`, canvas.width / 2, canvas.height / 2);
+  } else {
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'top';
+    ctx.fillStyle = 'black';
+    ctx.lineWidth = 3;
+    ctx.font = '26px sans-serif';
+    ctx.strokeText(`Score: ${snake.maxLength}`, canvas.width - 26 / 2, 26 / 2);
+    ctx.fillStyle = 'lightgreen';
+    ctx.font = '28px sans-serif';
+    ctx.fillText(`Score: ${snake.maxLength}`, canvas.width - 28 / 2, 28 / 2);
+  }
+}
 
 function resetCanvas() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
