@@ -95,7 +95,9 @@ function drawScore() {
       if (localStorage.highScore < score) {
         localStorage.highScore = score;
       }
-    } 
+    } else {
+      localStorage.highScore = score;
+    }
 
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
