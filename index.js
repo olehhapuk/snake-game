@@ -3,20 +3,40 @@ const ctx = canvas.getContext('2d');
 
 const scale = 10;
 const snake = new Snake();
+const food = new Food();
 let canChangeDirection = true;
 
 function start() {
   resetCanvas();
 
-  const newCoords = getRandCoords();
-  snake.setPosition(newCoords.x, newCoords.y);
+  spawn(snake);
+  spawn(food);
   
   setInterval(() => {
     resetCanvas();
     canChangeDirection = true;
     snake.update();
+    
+    // Check if snake eats the food
+    if (checkCollisions(snake, food)) {
+      spawn(food);
+    }
+
+    food.draw();
     snake.draw();
   }, 150);
+}
+
+function checkCollisions(a, b) {
+  if (a.x === b.x && a.y === b.y) {
+    return true;
+  }
+  return false;
+}
+
+function spawn(obj) {
+  const newCoords = getRandCoords();
+  obj.setPosition(newCoords.x, newCoords.y);
 }
 
 addEventListener('keydown', e => {
