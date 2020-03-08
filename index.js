@@ -9,17 +9,18 @@ let canChangeDirection = true;
 function start() {
   resetCanvas();
 
-  spawn(snake);
-  spawn(food);
+  spawnSnake();
+  spawnFood();
   
   setInterval(() => {
     resetCanvas();
     canChangeDirection = true;
     snake.update();
-    
+
     // Check if snake eats the food
-    if (checkCollisions(snake, food)) {
-      spawn(food);
+    if (checkCollisions(snake.tail[0], food)) {
+      eatFood();
+      spawnFood();
     }
 
     food.draw();
@@ -34,23 +35,38 @@ function checkCollisions(a, b) {
   return false;
 }
 
-function spawn(obj) {
+function eatFood() {
+  snake.tail.unshift({
+    x: snake.tail[snake.tail.length - 1].x - snake.vel.x * scale,
+    y: snake.tail[snake.tail.length - 1].y - snake.vel.y * scale
+  });
+}
+
+function spawnSnake() {
   const newCoords = getRandCoords();
-  obj.setPosition(newCoords.x, newCoords.y);
+  snake.tail.unshift({
+    x: newCoords.x,
+    y: newCoords.y
+  });
+}
+
+function spawnFood() {
+  const newCoords = getRandCoords();
+  food.setPosition(newCoords.x, newCoords.y);
 }
 
 addEventListener('keydown', e => {
   if (canChangeDirection) {
-    if (e.key === 'ArrowUp' && snake.vel.y === 0 && snake.y > 0) {
+    if (e.key === 'ArrowUp' && snake.vel.y === 0 && snake.tail[0].y > 0) {
       snake.setVelocity(0, 1);
       canChangeDirection = false;
-    } else if (e.key === 'ArrowDown' && snake.vel.y === 0 && snake.y < canvas.height - scale) {
+    } else if (e.key === 'ArrowDown' && snake.vel.y === 0 && snake.tail[0].y < canvas.height - scale) {
       snake.setVelocity(0, -1);
       canChangeDirection = false;
-    } else if (e.key === 'ArrowLeft' && snake.vel.x === 0 && snake.x > 0) {
+    } else if (e.key === 'ArrowLeft' && snake.vel.x === 0 && snake.tail[0].x > 0) {
       snake.setVelocity(-1, 0);
       canChangeDirection = false;
-    } else if (e.key === 'ArrowRight' && snake.vel.x === 0 && snake.x < canvas.width - scale) {
+    } else if (e.key === 'ArrowRight' && snake.vel.x === 0 && snake.tail[0].x < canvas.width - scale) {
       snake.setVelocity(1, 0);
       canChangeDirection = false;
     }
