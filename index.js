@@ -2,6 +2,7 @@ const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
 const scale = 10;
+let framerate = 5;
 const snake = new Snake();
 const food = new Food();
 let canChangeDirection = true;
@@ -13,31 +14,33 @@ function start() {
 
   spawnSnake();
   spawnFood();
-  
-  setInterval(() => {
-    resetCanvas();
-    canChangeDirection = true;
-    snake.update();
-
-    // Check if snake eats the food
-    if (checkCollisions(snake.tail[0], food)) {
-      eatFood();
-      spawnFood();
-    }
-    // Check if snake touches itself
-    snake.tail.forEach((partA, i) => {
-      snake.tail.forEach((partB, j) => {
-        if (checkCollisions(partA, partB) && i !== j) {
-          endGame();
-        }
-      });
-    });
-
-    food.draw();
-    snake.draw();
-    drawScore();
-  }, 150);
 }
+
+function update() {
+  resetCanvas();
+  canChangeDirection = true;
+  snake.update();
+
+  // Check if snake eats the food
+  if (checkCollisions(snake.tail[0], food)) {
+    eatFood();
+    spawnFood();
+  }
+  // Check if snake touches itself
+  snake.tail.forEach((partA, i) => {
+    snake.tail.forEach((partB, j) => {
+      if (checkCollisions(partA, partB) && i !== j) {
+        endGame();
+      }
+    });
+  });
+
+  food.draw();
+  snake.draw();
+  drawScore();
+}
+
+let updateInterval = setInterval(update, 1000 / framerate);
 
 function endGame() {
   snake.vel.x = 0;
@@ -58,6 +61,9 @@ function checkCollisions(a, b) {
 function eatFood() {
   snake.maxLength++;
   score++;
+  clearInterval(updateInterval);
+  framerate += 0.3;
+  updateInterval = setInterval(update, 1000 / framerate);
 }
 
 function spawnSnake() {
