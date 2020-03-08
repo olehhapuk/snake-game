@@ -6,6 +6,7 @@ const snake = new Snake();
 const food = new Food();
 let canChangeDirection = true;
 let gameEnd = false;
+let score = 0;
 
 function start() {
   resetCanvas();
@@ -56,6 +57,7 @@ function checkCollisions(a, b) {
 
 function eatFood() {
   snake.maxLength++;
+  score++;
 }
 
 function spawnSnake() {
@@ -71,16 +73,16 @@ function spawnFood() {
 
 addEventListener('keydown', e => {
   if (canChangeDirection && !gameEnd) {
-    if (e.key === 'ArrowUp' && snake.vel.y === 0 && snake.y > 0) {
+    if (e.key === 'ArrowUp' && snake.vel.y === 0) {
       snake.setVelocity(0, 1);
       canChangeDirection = false;
-    } else if (e.key === 'ArrowDown' && snake.vel.y === 0 && snake.y < canvas.height - scale) {
+    } else if (e.key === 'ArrowDown' && snake.vel.y === 0) {
       snake.setVelocity(0, -1);
       canChangeDirection = false;
-    } else if (e.key === 'ArrowLeft' && snake.vel.x === 0 && snake.x > 0) {
+    } else if (e.key === 'ArrowLeft' && snake.vel.x === 0) {
       snake.setVelocity(-1, 0);
       canChangeDirection = false;
-    } else if (e.key === 'ArrowRight' && snake.vel.x === 0 && snake.x < canvas.width - scale) {
+    } else if (e.key === 'ArrowRight' && snake.vel.x === 0) {
       snake.setVelocity(1, 0);
       canChangeDirection = false;
     }
@@ -89,26 +91,40 @@ addEventListener('keydown', e => {
 
 function drawScore() {
   if (gameEnd) {
+    if (localStorage.highScore) {
+      if (localStorage.highScore < score) {
+        localStorage.highScore = score;
+      }
+    } 
+
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillStyle = 'black';
-    ctx.lineWidth = 3;
-    ctx.font = '50px sans-serif';
-    ctx.strokeText(`Score: ${snake.maxLength}`, canvas.width / 2, canvas.height / 2);
-    ctx.fillStyle = 'lightgreen';
-    ctx.font = '60 sans-serif';
-    ctx.fillText(`Score: ${snake.maxLength}`, canvas.width / 2, canvas.height / 2);
+
+    drawText(`Your score: ${score}`, 'white', 60, 'black', 5, 0);
+    drawText(`High score: ${localStorage.highScore}`, 'lightgreen', 45, 'black', 5, 50);
+    drawText('Game will restart in 3 seconds', 'white', 18, 'black', 5, 90);
   } else {
     ctx.textAlign = 'right';
     ctx.textBaseline = 'top';
     ctx.fillStyle = 'black';
     ctx.lineWidth = 3;
     ctx.font = '26px sans-serif';
-    ctx.strokeText(`Score: ${snake.maxLength}`, canvas.width - 26 / 2, 26 / 2);
+    ctx.strokeText(`Score: ${score}`, canvas.width - 26 / 2, 26 / 2);
     ctx.fillStyle = 'lightgreen';
     ctx.font = '28px sans-serif';
-    ctx.fillText(`Score: ${snake.maxLength}`, canvas.width - 28 / 2, 28 / 2);
+    ctx.fillText(`Score: ${score}`, canvas.width - 28 / 2, 28 / 2);
   }
+}
+
+function drawText(text, textColor, textSize, strokeColor, strokeWidth, topOffset) {
+  ctx.strokeStyle = strokeColor;
+  ctx.lineWidth = strokeWidth;
+  ctx.font = `${textSize * 0.9}px sans-serif`;
+  ctx.strokeText(text, canvas.width / 2, canvas.height / 2 + topOffset);
+
+  ctx.fillStyle = textColor;
+  ctx.font = `${textSize}px sans-serif`;
+  ctx.fillText(text, canvas.width / 2, canvas.height / 2 + topOffset);
 }
 
 function resetCanvas() {

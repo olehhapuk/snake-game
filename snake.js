@@ -6,7 +6,7 @@ class Snake {
       x: 1,
       y: 0
     }
-    this.maxLength = 10;
+    this.maxLength = 3;
     this.tail = [];
     this.prevCoords;
 
@@ -16,9 +16,12 @@ class Snake {
     }
 
     this.draw = function() {
-      ctx.fillStyle = '#fff';
+      ctx.fillStyle = 'white';
+      ctx.strokeStyle = 'black';
+      ctx.lineWidth = 0.5;
       this.tail.forEach(part => {
         ctx.fillRect(part.x, part.y, scale, scale);
+        ctx.strokeRect(part.x, part.y, scale, scale);
       })
     }
 
@@ -34,11 +37,14 @@ class Snake {
         }
       }
 
-      if (this.x === 0 || this.x >= canvas.width - scale) {
-        this.vel.x = 0;
-      }
-      if (this.y === 0 || this.y >= canvas.height - scale) {
-        this.vel.y = 0;
+      if (this.x < 0) {
+        this.x = canvas.width;
+      } else if (this.x >= canvas.width) {
+        this.x = 0 - scale;
+      } else if (this.y < 0) {
+        this.y = canvas.height;
+      } else if (this.y >= canvas.width) {
+        this.y = 0 - scale;
       }
     }
   }
